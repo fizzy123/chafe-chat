@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>Chafe Chat</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+          $('.topic').click(function() {
+            var topic_id = $(this).data('id')
+            window.location = '/topic/' + topic_id
+          });
+        });
+    </script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='default.css') }}">
+  </head>
+  <body>
+    <h1>Chafe-Chat</h1>
+    <div class='topic-prompt'>
+      <form action='/' method='POST'>
+        <input placeholder='Give us a hot take' type='text' name='topic'>
+        <input type='submit' value='Submit'>
+      </form>
+    </div>
+    <div class='topic-container'>
+      {% for topic in topics %}
+      <div class='topic' data-id='{{topic.id}}'>
+        {{topic.topic}}
+      </div>
+      {% endfor %}
+    </div>
+  </body>
+</html>
