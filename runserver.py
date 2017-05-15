@@ -1,4 +1,4 @@
-import time, sys, os, urllib, uuid
+import time, sys, os, urllib, uuid, re, random
 import redis
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_socketio import SocketIO
@@ -37,8 +37,33 @@ def topic_post():
 @socketio.on('message')
 @app.route("/message", methods=['POST'])
 def handle_message():
-    data = request.form
+    data = dict(request.form)
+    data['message'] = re.sub(r"(almost|nearly|I think that|probably|usually|mostly)", "", data['message'], flags=re.I)
+    if random.random() < 0.05:
+        choices = ["Wrong.", "False.", "Nope.", "How do you not know"]
+        data['message'] = random.choice(choices) + " " + ['data.mesasge']
+
+    if random.random() < 0.5:
+        words = ["stupid", "ridiculous", "idiotic", "crazy"]
+        data['message'] = re.sub(r"argument", random.choice(words) + " argument", data['message'], flags=re.I)
+
+    if random.random() < 0.1:
+        responses = ["Wow", "Seriously?", "Hahahahahahahahaha", "holy shit"]
+        socketio.emit('message', {"topic": data['topic'],
+                                  "client_id": data['client_id'],
+                                  "message": random.choice(responses)
+                                 }
+                    )
+
+    if random.random() < 0.1:
+        data['message'] = re.sub(r"you", "people like you", data['message'], flags=re.I)
+
+    if random.random() < 0.1:
+        words = data['message'].split()
+        index = random.choice(range(0, len(words)))
+        words[index] = words[index].upper()
+        data['message'] = " ".join(words)
     socketio.emit('message', data)
     return jsonify({"success": True})
 
-socketio.run(app, port=3000)
+socketio.run(app, port=3000, debug=True, host='0.0.0.0')
